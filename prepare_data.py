@@ -14,8 +14,8 @@ def get_seq():
                 else:
                     wf.write(lines[i])
 def count_protein_len():
-    proteins = list(SeqIO.parse('data/2017_DNA_train_data.txt', 'fasta'))
-    proteins.extend(list(SeqIO.parse('data/2017_RNA_train_data.txt', 'fasta')))
+    proteins = list(SeqIO.parse('data/2017_DNA_train_data_seq.txt', 'fasta'))
+    proteins.extend(list(SeqIO.parse('data/2017_RNA_train_data_seq.txt', 'fasta')))
     tmax=0
     tmin=9999
     L=[]
