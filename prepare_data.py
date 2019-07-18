@@ -31,17 +31,20 @@ def count_protein_len():
     print L
 
 def get_label():
-    with open('data/2017_DNA_test_data.txt', 'r') as f:
-        if not os.path.isdir('data/2017_DNA_test_data_label'):
-            os.makedirs('data/2017_DNA_test_data_label')
+    with open('data/2017_DNA_train_data.txt', 'r') as f:
+        if not os.path.isdir('data/2017_DNA_train_data_label/labels_masking'):
+            os.makedirs('data/2017_DNA_train_data_label/labels_masking')
         lines = f.readlines()
         for i in range(len(lines)):
                 if '>' in lines[i]:
-                    with open('data/2017_DNA_test_data_label/'+lines[i].strip().split('>')[-1]+'.txt', 'w') as wf:
-                        for e in lines[i+2].strip().replace('2', '0'):
-                            wf.write(e+'\n')
+                    with open('data/2017_DNA_train_data_label/'+lines[i].strip().split('>')[-1]+'.txt', 'w') as wf:
+                        for e in lines[i+2].strip():
+                            if e == '2':
+                                wf.write('-1\n')
+                            else:
+                                wf.write(e + '\n')
                 else:
                     pass
 
 if __name__ == '__main__':
-    count_protein_len()
+    get_label()
