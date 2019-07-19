@@ -45,6 +45,27 @@ def get_label():
                                 wf.write(e + '\n')
                 else:
                     pass
+def get_bioseq_analysis_style():
+    # proteins = list(SeqIO.parse('data/2017_DNA_test_data.txt', 'fasta'))
+    with open('data/2017_RNA_test_data.txt', 'r') as f:
+        lines = f.readlines()
+        with open('data/2017_RNA_test_data_label_bioseq_analysis.txt', 'w') as wf:
+            with open('data/2017_RNA_test_data_seq_bioseq_analysis.txt', 'w') as df:
+                for i in range(len(lines)):
+                    if int(i + 1) % 3 == 0:
+                        for j in range(len(lines[i].strip())):
+                            if lines[i].strip()[j] == '2':
+                                pass
+                            else:
+                                wf.write(lines[i].strip()[j]+' ')
+                                df.write(lines[i-1].strip()[j])
+                        wf.write('\n')
+                        df.write('\n')
+                    elif '>' in lines[i]:
+                        wf.write(lines[i].strip() + '\n')
+                        df.write(lines[i].strip() + '\n')
+                    else:
+                        pass
 
 if __name__ == '__main__':
-    get_label()
+    get_bioseq_analysis_style()
