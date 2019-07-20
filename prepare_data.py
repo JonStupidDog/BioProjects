@@ -2,12 +2,11 @@ from Bio import SeqIO
 import numpy as np
 import os
 def get_seq():
-    proteins = list(SeqIO.parse('data/2017_DNA_test_data.txt', 'fasta'))
-    print proteins[0].seq
-
-    with open('data/2017_RNA_test_data.txt','r') as f:
-        lines=f.readlines()
-        with open('data/2017_RNA_test_data_seq.txt','w') as wf:
+    # proteins = list(SeqIO.parse('data/2017_DNA_test_data.txt', 'fasta'))
+    # print proteins[0].seq
+    with open('data/YK16_3.5A_DNA_training.fasta','r') as f:
+        lines = f.readlines()[4:]
+        with open('data/YK16_3.5A_DNA_training_seq.txt','w') as wf:
             for i in range(len(lines)):
                 if int(i+1) % 3 == 0:
                     continue
@@ -49,8 +48,8 @@ def get_bioseq_analysis_style():
     # proteins = list(SeqIO.parse('data/2017_DNA_test_data.txt', 'fasta'))
     with open('data/2017_RNA_test_data.txt', 'r') as f:
         lines = f.readlines()
-        with open('data/2017_RNA_test_data_label_bioseq_analysis.txt', 'w') as wf:
-            with open('data/2017_RNA_test_data_seq_bioseq_analysis.txt', 'w') as df:
+        with open('data/2017_RNA_test_data_label.txt', 'w') as wf:
+            with open('data/2017_RNA_test_data_seq.txt', 'w') as df:
                 for i in range(len(lines)):
                     if int(i + 1) % 3 == 0:
                         for j in range(len(lines[i].strip())):
@@ -67,5 +66,30 @@ def get_bioseq_analysis_style():
                     else:
                         pass
 
+def get_seq_and_label():
+    file_name = 'New_R15'
+    with open('data/'+file_name+'.fasta', 'r') as f:
+        lines = f.readlines()[4:]
+        with open('data/'+file_name+'_seq.txt', 'w') as wf:
+            for i in range(len(lines)):
+                if int(i+1) % 3 == 0:
+                    continue
+                else:
+                    if '>' in lines[i]:
+                        wf.write(lines[i].split()[0])
+                    else:
+                        wf.write(lines[i])
+        if not os.path.isdir('data/'+file_name+'_label'):
+            os.makedirs('data/'+file_name+'_label')
+        for i in range(len(lines)):
+                if '>' in lines[i]:
+                    with open('data/'+file_name+'_label/'+lines[i].split()[0].split('>')[-1]+'.txt', 'w') as wf:
+                        for e in lines[i+2].strip():
+                            if e == '2':
+                                wf.write('-1\n')
+                            else:
+                                wf.write(e + '\n')
+                else:
+                    pass
 if __name__ == '__main__':
-    get_bioseq_analysis_style()
+    get_seq()
