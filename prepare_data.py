@@ -31,8 +31,6 @@ def count_protein_len():
 
 def get_label():
     with open('data/2017_DNA_train_data.txt', 'r') as f:
-        if not os.path.isdir('data/2017_DNA_train_data_label/labels_masking'):
-            os.makedirs('data/2017_DNA_train_data_label/labels_masking')
         lines = f.readlines()
         for i in range(len(lines)):
                 if '>' in lines[i]:
@@ -44,6 +42,7 @@ def get_label():
                                 wf.write(e + '\n')
                 else:
                     pass
+
 def get_bioseq_analysis_style():
     # proteins = list(SeqIO.parse('data/2017_DNA_test_data.txt', 'fasta'))
     with open('data/2017_RNA_test_data.txt', 'r') as f:
@@ -67,8 +66,8 @@ def get_bioseq_analysis_style():
                         pass
 
 def get_seq_and_label():
-    file_name = 'New_R15'
-    with open('data/'+file_name+'.fasta', 'r') as f:
+    file_name = 'YK16_5A_DNA_training'
+    with open('data/'+file_name+'.txt', 'r') as f:
         lines = f.readlines()[4:]
         with open('data/'+file_name+'_seq.txt', 'w') as wf:
             for i in range(len(lines)):
@@ -76,9 +75,9 @@ def get_seq_and_label():
                     continue
                 else:
                     if '>' in lines[i]:
-                        wf.write(lines[i].split()[0])
+                        wf.write(lines[i].split()[0]+'\n')
                     else:
-                        wf.write(lines[i])
+                        wf.write(lines[i].strip()+'\n')
         if not os.path.isdir('data/'+file_name+'_label'):
             os.makedirs('data/'+file_name+'_label')
         for i in range(len(lines)):
@@ -91,5 +90,98 @@ def get_seq_and_label():
                                 wf.write(e + '\n')
                 else:
                     pass
+
+def get_multi_label():
+    file_name = 'New_D31'
+    rfile_name = 'New_R15'
+    with open('data/'+file_name+'.txt', 'r') as f:
+        lines = f.readlines()[4:]
+        if not os.path.isdir('data/'+file_name+'_label'):
+            os.makedirs('data/'+file_name+'_label')
+        for i in range(len(lines)):
+                if '>' in lines[i]:
+                    with open('data/'+file_name+'_label/'+lines[i].split()[0].split('>')[-1]+'_d.txt', 'w') as wf:
+                        for e in lines[i+2].strip():
+                            if e == '2':
+                                wf.write('-1\n')
+                            else:
+                                wf.write(e + '\n')
+                    with open('data/'+file_name+'_label/'+lines[i].split()[0].split('>')[-1]+'_r.txt', 'w') as wf:
+                        if os.path.isfile('data/'+rfile_name+'_label/'+lines[i].split()[0].split('>')[-1]+'.txt'):
+                            with open('data/'+rfile_name+'_label/'+lines[i].split()[0].split('>')[-1]+'.txt') as rf:
+                                for e in rf:
+                                    wf.write(e.strip()+'\n')
+                        else:
+                            for e in lines[i+2].strip():
+                                if e == '2':
+                                    wf.write('-1\n')
+                                else:
+                                    wf.write('0\n')
+                else:
+                    pass
+
+def get_seq_and_label_combine():
+    file_name = 'TRAINING.fasta'
+    with open('drnapred_data/'+file_name+'.txt', 'r') as f:
+        lines = f.readlines()
+        with open('drnapred_data/'+file_name+'_seq.txt', 'w') as wf:
+            for i in range(len(lines)):
+                if '>' in lines[i]:
+                    wf.write(lines[i].strip()+'\n')
+                    wf.write(lines[i+1].strip()+'\n')
+                else:
+                    pass
+        if not os.path.isdir('drnapred_data/'+file_name+'_label'):
+            os.makedirs('drnapred_data/'+file_name+'_label')
+        for i in range(len(lines)):
+                if '>' in lines[i]:
+                    with open('drnapred_data/'+file_name+'_label/'+lines[i].strip().split('>')[-1]+'_d.txt', 'w') as wf:
+                        for e in lines[i+2].strip():
+                            if e == '2':
+                                wf.write('-1\n')
+                            else:
+                                wf.write(e + '\n')
+                    with open('drnapred_data/'+file_name+'_label/'+lines[i].strip().split('>')[-1]+'_r.txt', 'w') as wf:
+                        for e in lines[i+3].strip():
+                            if e == '2':
+                                wf.write('-1\n')
+                            else:
+                                wf.write(e + '\n')
+                else:
+                    pass
 if __name__ == '__main__':
-    get_seq()
+    # get_multi_label()
+    prots5 = list(SeqIO.parse('data/train_all_seq.txt', 'fasta'))
+    idd = []
+    for prot in prots5:
+        idd.append(prot.id)
+    tmp = []
+    prots5 = list(SeqIO.parse('data/test_all_seq.txt', 'fasta'))
+    for prot in prots5:
+        if prot.id not in idd:
+            tmp.append(prot)
+            idd.append(prot.id)
+
+    # prots5 = list(SeqIO.parse('data/YK16_test_seq.txt', 'fasta'))
+    # for prot in prots5:
+    #     if prot.id not in idd:
+    #         tmp.append(prot)
+    #         idd.append(prot.id)
+    #
+    # prots5 = list(SeqIO.parse('data/New_data_seq.txt', 'fasta'))
+    # for prot in prots5:
+    #     if prot.id not in idd:
+    #         tmp.append(prot)
+    #         idd.append(prot.id)
+    #
+    print len(tmp)
+    SeqIO.write(tmp, 'data/test_all_seq.txt', 'fasta')
+
+
+
+
+    # with open('drnapred_data/lists_DNA.txt') as f:
+    #     idd = [e.strip() for e in f]
+    # with open('drnapred_data/lists_RNA.txt') as f:
+    #     idr = [e.strip() for e in f]
+    # print len(set(idd) & set(idr))
