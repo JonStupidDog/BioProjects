@@ -92,4 +92,11 @@ def get_seq_and_label():
                 else:
                     pass
 if __name__ == '__main__':
-    get_seq()
+    prots = SeqIO.parse('data/all_test_seq.txt','fasta')
+    ids = []
+    tmp_prots = []
+    for prot in prots:
+        if prot.id not in ids:
+            ids.append(prot.id)
+            tmp_prots.append(prot)
+    SeqIO.write(tmp_prots, 'data/uniq_all_test_seq.txt', 'fasta')
