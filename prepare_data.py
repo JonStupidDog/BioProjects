@@ -149,38 +149,82 @@ def get_seq_and_label_combine():
                                 wf.write(e + '\n')
                 else:
                     pass
-if __name__ == '__main__':
-    prots5 = list(SeqIO.parse('data/train_all_seq.txt', 'fasta'))
-    idd = []
-    for prot in prots5:
-        idd.append(prot.id)
-    tmp = []
-    prots5 = list(SeqIO.parse('data/test_all_seq.txt', 'fasta'))
-    for prot in prots5:
-        if prot.id not in idd:
-            tmp.append(prot)
-            idd.append(prot.id)
 
-    # prots5 = list(SeqIO.parse('data/YK16_test_seq.txt', 'fasta'))
-    # for prot in prots5:
-    #     if prot.id not in idd:
-    #         tmp.append(prot)
-    #         idd.append(prot.id)
-    #
-    # prots5 = list(SeqIO.parse('data/New_data_seq.txt', 'fasta'))
-    # for prot in prots5:
-    #     if prot.id not in idd:
-    #         tmp.append(prot)
-    #         idd.append(prot.id)
-    #
+def split_DRNApred_results(file_path):
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        for i in range(len(lines)):
+            if '>' in lines[i]:
+                with open('result/YK16_3.5/' + lines[i].strip().strip('>') + '.txt', 'w') as wf:
+                    n = 2
+                    while n > 0:
+                        wf.write(lines[i+n].strip().split()[1]+'\t'+lines[i+n].strip().split()[3]+'\n')
+                        n += 1
+                        if i+n >= len(lines):
+                            break
+                        elif '>' in lines[i+n]:
+                            n = 0
+                        else:
+                            pass
+
+
+if __name__ == '__main__':
+    prots5 = list(SeqIO.parse('data/New_data_seq.txt', 'fasta'))
+    id1 = []
+    for prot in prots5:
+        id1.append(prot.id)
+    id2 = []
+    prots5 = list(SeqIO.parse('data/YK16_test_seq3.txt', 'fasta'))
+    for prot in prots5:
+        id2.append(prot.id)
+
+    prots5 = list(SeqIO.parse('drnapred_data/TRAINING.fasta_seq.txt', 'fasta'))
+    id3 = []
+    for prot in prots5:
+        id3.append(prot.id)
+
+    prots5 = list(SeqIO.parse('drnapred_data/TEST.fasta_seq.txt', 'fasta'))
+    id4 = []
+    for prot in prots5:
+        id4.append(prot.id)
+
     print len(tmp)
     SeqIO.write(tmp, 'data/test_all_seq.txt', 'fasta')
+    split_DRNApred_results('result/results.txt')
 
 
 
-
-    # with open('drnapred_data/lists_DNA.txt') as f:
-    #     idd = [e.strip() for e in f]
-    # with open('drnapred_data/lists_RNA.txt') as f:
-    #     idr = [e.strip() for e in f]
-    # print len(set(idd) & set(idr))
+    with open('drnapred_data/lists_DNA.txt') as f:
+        idd = [e.strip() for e in f]
+    with open('drnapred_data/lists_RNA.txt') as f:
+        idr = [e.strip() for e in f]
+    print len(set(id3) & set(id1))
+    print len(set(id4) & set(id1))
+    print len(set(id2) & set(id1))
+    # A = [0, 319, 320, 529, 182, 353, 538, 545, 183, 316, 319, 348, 350, 353, 448, 449, 395, 525, 529, 28,
+    #      0, 319, 320, 322, 525, 529, 353, 401, 416, 474, 510, 528, 538, 545, 183, 316, 348, 449, 453, 36,
+    #      0, 319, 320, 529, 182, 353, 538, 545, 183, 316, 319, 348, 350, 353, 448, 449, 395, 525, 529, 28]
+    # B = [12,  13,  14, 153, 183, 254, 316, 319, 348, 350, 353, 357, 448, 449, 450, 451, 452, 453, 495, 496,
+    #      0,  37,  70,  88,  90,  96, 133, 148, 183, 216, 319, 322, 358, 373, 495, 519, 520, 524, 525, 529,
+    #      187, 193, 196, 201, 219, 223, 231, 251, 256, 263, 289, 293, 352, 388, 426, 477, 481, 491, 520, 537]
+    # # C = set(A)&set(B)
+    # # print len(C)
+    # # print C
+    #
+    # tmp1 = []
+    # for e in A:
+    #     if e not in tmp1:
+    #         tmp1.append(e)
+    # print len(tmp1)
+    # print tmp1
+    #
+    # tmp2 = []
+    # for e in B:
+    #     if e not in tmp2:
+    #         tmp2.append(e)
+    # print len(tmp2)
+    # print tmp2
+    #
+    # C = set(tmp2)|set(tmp1)
+    # print len(C)
+    # print C
