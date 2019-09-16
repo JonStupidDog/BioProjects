@@ -45,6 +45,7 @@ def calculate_distance(pid):
     return contac
 
 def check_residue(pid):
+    ids = []
     parser = PDBParser()
     structure = parser.get_structure(pid, 'examples/pdb' + pid + '.ent')
     for model in structure:
@@ -52,27 +53,66 @@ def check_residue(pid):
             n = 0
             for residue in chain:
                 if residue.get_resname() in AA:
+                    ids.append(residue.get_id()[1])
                     print AA_dic[residue.get_resname()], residue.get_id()[1]
                     n += 1
             print chain, n
+    return ids
 
 
 
 if __name__ == '__main__':
-    # check_residue('6OMF')
-    contac = calculate_distance('6OMF')
-    for e in contac:
-        # print e[0].get_resname(), e[1].get_resname()
-        if (str(e[0].get_resname()).strip() in AA) and (str(e[1].get_resname()).strip() in RA):
-            print e[0].get_id()[1], str(e[1].get_resname()).strip()
-        if (str(e[0].get_resname()).strip() in RA) and (str(e[1].get_resname()).strip() in AA):
-            print e[1].get_id()[1], str(e[0].get_resname()).strip()
-        if (str(e[0].get_resname()).strip() in AA) and (str(e[1].get_resname()).strip() in DA):
-            print e[0].get_id()[1], str(e[1].get_resname()).strip()
-        if (str(e[0].get_resname()).strip() in DA) and (str(e[1].get_resname()).strip() in AA):
-            print e[1].get_id()[1], str(e[0].get_resname()).strip()
+    # ids = check_residue('6joo')
+    # contac = calculate_distance('6joo')
+    # contac_labels = {}
+    # for e in contac:
+    #     # print e[0].get_resname(), e[1].get_resname()
+    #     if (str(e[0].get_resname()).strip() in AA) and (str(e[1].get_resname()).strip() in RA):
+    #         print e[0].get_id()[1], str(e[1].get_resname()).strip()
+    #         if int(e[0].get_id()[1])+2 not in contac_labels.keys():
+    #             contac_labels[int(e[0].get_id()[1])+2] = [0, 1]
+    #         else:
+    #             contac_labels[int(e[0].get_id()[1]) + 2][1] = 1
+    #     if (str(e[0].get_resname()).strip() in RA) and (str(e[1].get_resname()).strip() in AA):
+    #         print e[1].get_id()[1], str(e[0].get_resname()).strip()
+    #         if int(e[1].get_id()[1])+2 not in contac_labels.keys():
+    #             contac_labels[int(e[1].get_id()[1])+2] = [0, 1]
+    #         else:
+    #             contac_labels[int(e[1].get_id()[1]) + 2][1] = 1
+    #     if (str(e[0].get_resname()).strip() in AA) and (str(e[1].get_resname()).strip() in DA):
+    #         print e[0].get_id()[1], str(e[1].get_resname()).strip()
+    #         if int(e[0].get_id()[1])+2 not in contac_labels.keys():
+    #             contac_labels[int(e[0].get_id()[1])+2] = [1, 0]
+    #         else:
+    #             contac_labels[int(e[0].get_id()[1]) + 2][0] = 1
+    #     if (str(e[0].get_resname()).strip() in DA) and (str(e[1].get_resname()).strip() in AA):
+    #         print e[1].get_id()[1], str(e[0].get_resname()).strip()
+    #         if int(e[1].get_id()[1])+2 not in contac_labels.keys():
+    #             contac_labels[int(e[1].get_id()[1])+2] = [1, 0]
+    #         else:
+    #             contac_labels[int(e[1].get_id()[1]) + 2][0] = 1
+    # prots = list(SeqIO.parse('examples/6JOO_seq.txt', 'fasta'))
+    # with open('examples/6joo_label.txt', 'w') as f:
+    #     for i in range(len(prots[0].seq)):
+    #         if i-2 not in ids:
+    #             if i not in contac_labels.keys():
+    #                 f.write('0\t0\t1\n')
+    #             else:
+    #                 f.write('%d\t%d\t1\n' % tuple(contac_labels[i]))
+    #         else:
+    #             if i not in contac_labels.keys():
+    #                 f.write('0\t0\t0\n')
+    #             else:
+    #                 f.write('%d\t%d\t0\n' % tuple(contac_labels[i]))
 
-    # download_pdb_ent(['6OMF'])
+    ids = []
+    with open('examples/pdb_ids.txt', 'r') as f:
+        lines = f.readline().split(', ')
+        for e in lines:
+            if e.strip() not in ids:
+                ids.append(e.strip())
+    print len(ids)
+    download_pdb_ent(ids)
 
 
 

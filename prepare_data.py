@@ -169,38 +169,45 @@ def split_DRNApred_results(file_path):
 
 
 if __name__ == '__main__':
-    prots5 = list(SeqIO.parse('data/New_data_seq.txt', 'fasta'))
-    id1 = []
-    for prot in prots5:
-        id1.append(prot.id)
-    id2 = []
-    prots5 = list(SeqIO.parse('data/YK16_test_seq3.txt', 'fasta'))
-    for prot in prots5:
-        id2.append(prot.id)
+    prots = list(SeqIO.parse('data/examples_seq_A_output.txt', 'fasta'))
+    ids = []
+    tmp_prots = []
+    for prot in prots:
+       if len(prot.seq) > 50 and 'U' not in prot.seq and 'X' not in prot.seq:
+           tmp_prots.append(prot)
 
-    prots5 = list(SeqIO.parse('drnapred_data/TRAINING.fasta_seq.txt', 'fasta'))
-    id3 = []
-    for prot in prots5:
-        id3.append(prot.id)
-
-    prots5 = list(SeqIO.parse('drnapred_data/TEST.fasta_seq.txt', 'fasta'))
-    id4 = []
-    for prot in prots5:
-        id4.append(prot.id)
-
-    print len(tmp)
-    SeqIO.write(tmp, 'data/test_all_seq.txt', 'fasta')
-    split_DRNApred_results('result/results.txt')
-
-
-
-    with open('drnapred_data/lists_DNA.txt') as f:
-        idd = [e.strip() for e in f]
-    with open('drnapred_data/lists_RNA.txt') as f:
-        idr = [e.strip() for e in f]
-    print len(set(id3) & set(id1))
-    print len(set(id4) & set(id1))
-    print len(set(id2) & set(id1))
+    # prots5 = list(SeqIO.parse('data/New_data_seq.txt', 'fasta'))
+    # id1 = []
+    # for prot in prots5:
+    #     id1.append(prot.id)
+    # id2 = []
+    # prots5 = list(SeqIO.parse('data/YK16_test_seq3.txt', 'fasta'))
+    # for prot in prots5:
+    #     id2.append(prot.id)
+    #
+    # prots5 = list(SeqIO.parse('drnapred_data/TRAINING.fasta_seq.txt', 'fasta'))
+    # id3 = []
+    # for prot in prots5:
+    #     id3.append(prot.id)
+    #
+    # prots5 = list(SeqIO.parse('drnapred_data/TEST.fasta_seq.txt', 'fasta'))
+    # id4 = []
+    # for prot in prots5:
+    #     id4.append(prot.id)
+    #
+    # print len(tmp)
+    SeqIO.write(tmp_prots, 'data/examples_seq.txt', 'fasta')
+    # split_DRNApred_results('result/results.txt')
+    #
+    #
+    #
+    # with open('drnapred_data/lists_DNA.txt') as f:
+    #     idd = [e.strip() for e in f]
+    # with open('drnapred_data/lists_RNA.txt') as f:
+    #     idr = [e.strip() for e in f]
+    # print len(set(id3) & set(id1))
+    # print len(set(id4) & set(id1))
+    # print len(set(id2) & set(id1))
     # A = [0, 319, 320, 529, 182, 353, 538, 545, 183, 316, 319, 348, 350, 353, 448, 449, 395, 525, 529, 28,
     #      0, 319, 320, 322, 525, 529, 353, 401, 416, 474, 510, 528, 538, 545, 183, 316, 348, 449, 453, 36,
     #      0, 319, 320, 529, 182, 353, 538, 545, 183, 316, 319, 348, 350, 353, 448, 449, 395, 525, 529, 28]
