@@ -8,7 +8,7 @@ import os
 import argparse
 import numpy as np
 from Bio import SeqIO
-from sklearn.metrics import roc_auc_score, accuracy_score, recall_score, precision_score
+from sklearn.metrics import roc_auc_score, accuracy_score, recall_score, precision_score, f1_score
 from sklearn.metrics import matthews_corrcoef, auc, roc_curve, classification_report, precision_recall_curve
 from sklearn.metrics import coverage_error
 from sklearn.metrics import label_ranking_loss

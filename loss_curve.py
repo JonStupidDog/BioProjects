@@ -195,11 +195,11 @@ def loss_curve(ylim=None):
     val_auc1 = []
     val_auc2 = []
     val_auc3 = []
-    with open('result/YK16_3.5_early_stop_with_disorder_wind7_hmm_ss_aa_multi_bilstm_fc_loss.txt', 'r') as f:
+    with open('result/YK17_early_stop_with_disorder_hmm_ss_aa_multi_bigru_fc_loss.txt', 'r') as f:
         lines = f.readlines()
         for i in range(150):
             if i == 0:
-                train_loss.append(2.6)
+                train_loss.append(3.0)
                 val_auc1.append(0.5)
                 val_auc2.append(0.5)
                 val_auc3.append(0.5)
@@ -221,9 +221,9 @@ def loss_curve(ylim=None):
 
 
     plt.grid()
-    plt.plot(train_sizes, train_loss, '-', color="r", label="training loss", )
-    plt.plot(train_sizes, val_auc1, '-', color="b", label="val auc1")
-    plt.plot(train_sizes, val_auc2, '-', color="y", label="val auc2")
+    plt.plot(train_sizes, train_loss, '-', color="red", label="training loss", )
+    plt.plot(train_sizes, val_auc1, '-', color="blue", label="val auc1")
+    plt.plot(train_sizes, val_auc2, '-', color="#0066CC", label="val auc2")
     plt.plot(train_sizes, val_auc3, '-', color="gray", label="val auc3")
     plt.legend(loc="best")
     return plt

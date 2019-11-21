@@ -155,10 +155,11 @@ def split_DRNApred_results(file_path):
         lines = f.readlines()
         for i in range(len(lines)):
             if '>' in lines[i]:
-                with open('result/YK16_3.5/' + lines[i].strip().strip('>') + '.txt', 'w') as wf:
+                with open('result/YK17/' + lines[i].strip().strip('>') + '.txt', 'w') as wf:
                     n = 2
                     while n > 0:
-                        wf.write(lines[i+n].strip().split()[1]+'\t'+lines[i+n].strip().split()[3]+'\n')
+                        # wf.write(lines[i+n].strip().split()[1]+'\t'+lines[i+n].strip().split()[3]+'\n')
+                        wf.write(lines[i + n].strip() + '\n')
                         n += 1
                         if i+n >= len(lines):
                             break
@@ -166,15 +167,103 @@ def split_DRNApred_results(file_path):
                             n = 0
                         else:
                             pass
+def split_DisDRBP_results(file_path):
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        for i in range(len(lines)):
+            if '>' in lines[i]:
+                with open('result/YK17_DisDRBP/' + lines[i].strip().strip('>') + '.txt', 'w') as wf:
+                    RNA_pred = lines[i + 2].strip().split(':')[1]
+                    RNA_score = lines[i + 3].strip().split(':')[1].split(',')
+                    DNA_pred = lines[i + 4].strip().split(':')[1]
+                    DNA_score = lines[i + 5].strip().split(':')[1].split(',')
+                    for j in range(len(RNA_pred)):
+                        wf.write(DNA_pred[j])
+                        wf.write('\t')
+                        wf.write(DNA_score[j])
+                        wf.write('\t')
+                        wf.write(RNA_pred[j])
+                        wf.write('\t')
+                        wf.write(RNA_score[j])
+                        wf.write('\n')
+            else:
+                pass
 
+def split_DisDRBP_data(file_path):
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        for i in range(len(lines)):
+            if '>' in lines[i]:
+                with open('data/DisDRBP_test_36_label/' + lines[i].strip().strip('>') + '_d.txt', 'w') as wf:
+                    DNA_label = lines[i + 3].strip().split(':')[1]
+                    for e in DNA_label:
+                        if e == 'x':
+                            wf.write('-1')
+                            wf.write('\n')
+                        else:
+                            wf.write(e)
+                            wf.write('\n')
+                with open('data/DisDRBP_test_36_label/' + lines[i].strip().strip('>') + '_r.txt', 'w') as wf:
+                    RNA_label = lines[i + 2].strip().split(':')[1]
+                    for e in RNA_label:
+                        if e == 'x':
+                            wf.write('-1')
+                            wf.write('\n')
+                        else:
+                            wf.write(e)
+                            wf.write('\n')
+            else:
+                pass
+def count_transfer_disobind():
+    test_file_path = 'drnapred_data/TRAINING.fasta_seq.txt'
+    test_prots = list(SeqIO.parse(test_file_path, 'fasta'))
+    print len(test_prots)
+    true_labels1 = []
+    true_labels2 = []
+    true_labels3 = []
+    for prot in test_prots:
+        with open('./drnapred_data/train_label/' + prot.id + '_d.txt') as f:
+            labels1 = [float(label.strip()) for label in f]
+        with open('./drnapred_data/train_label/' + prot.id + '_r.txt') as f:
+            labels2 = [float(label.strip()) for label in f]
+        for i in range(len(prot.seq)):
+            if labels1[i] < 0 or labels2[i] < 0:
+                true_labels3.append(1.0)
+                if labels1[i] < 0:
+                    true_labels1.append(0.0)
+                else:
+                    true_labels1.append(labels1[i])
+                if labels2[i] < 0:
+                    true_labels2.append(0.0)
+                else:
+                    true_labels2.append(labels2[i])
+            else:
+                true_labels1.append(0.0)
+                true_labels2.append(0.0)
+                true_labels3.append(0.0)
+    print sum(true_labels3), sum(true_labels1), sum(true_labels2)
+
+def test_numpy_mask():
+    import numpy.ma as ma
+    x = np.array([[1, 2, 3, 5, 7, 4, 3, 2, 8, 0], [1, 6, 3, 5, 9, 4, 6, 2, 8, 1]])
+    mask = x < 5
+    mx = ma.array(x, mask=mask)
+    for e in mx:
+        for i in e:
+            print i
 
 if __name__ == '__main__':
-    prots = list(SeqIO.parse('data/examples_seq_A_output.txt', 'fasta'))
-    ids = []
-    tmp_prots = []
-    for prot in prots:
-       if len(prot.seq) > 50 and 'U' not in prot.seq and 'X' not in prot.seq:
-           tmp_prots.append(prot)
+    test_numpy_mask()
+    # count_transfer_disobind()
+    # for i in range(10):
+    #     with open('test.txt', 'a') as f:
+    #         f.write('1\n')
+    # prots = list(SeqIO.parse('data/examples_seq_A_output.txt', 'fasta'))
+    # ids = []
+    # tmp_prots = []
+    # for prot in prots:
+    #    if len(prot.seq) > 50 and 'U' not in prot.seq and 'X' not in prot.seq:
+    #        tmp_prots.append(prot)
 
     # prots5 = list(SeqIO.parse('data/New_data_seq.txt', 'fasta'))
     # id1 = []
@@ -196,8 +285,10 @@ if __name__ == '__main__':
     #     id4.append(prot.id)
     #
     # print len(tmp)
-    SeqIO.write(tmp_prots, 'data/examples_seq.txt', 'fasta')
-    # split_DRNApred_results('result/results.txt')
+    # SeqIO.write(tmp_prots, 'data/examples_seq.txt', 'fasta')
+    # split_DRNApred_results('result/YK17-results.txt')
+    # split_DisDRBP_results('result/DisDRBP_results.txt')
+    # split_DisDRBP_data('data/Disorder_binding_Test_36.txt')
     #
     #
     #

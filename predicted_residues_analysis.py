@@ -120,7 +120,7 @@ def distance_labels(labels, distance):
                 temp_labels.append(0)
     return temp_labels
 
-def get_perfomance(labels, scores, distance, threshold):
+def get_perfomance(labels, scores, distance):
     dTP = 0.0
     TP = 0.0
     TN = 0.0
@@ -131,26 +131,26 @@ def get_perfomance(labels, scores, distance, threshold):
             print 'ERROR!'
         else:
             for i in range(len(true_labels)):
-                if true_labels[i] > 0 and pred_scores[i] >= threshold:
+                if true_labels[i] > 0 and pred_scores[i] > 0:
                     TP += 1.0
-                if true_labels[i] > 0 and pred_scores[i] < threshold:
+                if true_labels[i] > 0 and pred_scores[i] < 1:
                     FN += 1.0
-                if true_labels[i] == 0 and pred_scores[i] >= threshold:
+                if true_labels[i] == 0 and pred_scores[i] > 0:
                     FP += 1.0
-                if true_labels[i] == 0 and pred_scores[i] < threshold:
+                if true_labels[i] == 0 and pred_scores[i] < 1:
                     TN += 1.0
 
                 if i < distance:
                     if sum(true_labels[:i+1+distance]) > 0:
-                        if pred_scores[i] >= threshold:
+                        if pred_scores[i] > 0:
                             dTP += 1.
                 elif i >= len(true_labels)-distance-1:
                     if sum(true_labels[i-distance:]) > 0:
-                        if pred_scores[i] >= threshold:
+                        if pred_scores[i] > 0:
                             dTP += 1.
                 else:
                     if sum(true_labels[i-distance:i+distance+1]) > 0:
-                        if pred_scores[i] >= threshold:
+                        if pred_scores[i] > 0:
                             dTP += 1.
 
     ca = dTP - TP
@@ -170,6 +170,8 @@ def get_labels_scores(test_prots):
     pred_scores12 = []
     pred_scores21 = []
     pred_scores22 = []
+    pred_scores31 = []
+    pred_scores32 = []
     for prot in test_prots:
         with open('./result/test_label/' + prot.id + '_d.txt') as f:
             labels1 = []
@@ -192,20 +194,32 @@ def get_labels_scores(test_prots):
             scores1 = []
             scores2 = []
             for line in f:
-                scores1.append(float(line.strip().split()[0]))
-                scores2.append(float(line.strip().split()[1]))
+                scores1.append(float(line.strip().split()[2]))
+                scores2.append(float(line.strip().split()[4]))
             pred_scores11.append(scores1)
             pred_scores12.append(scores2)
-        with open('./result/YK17_test_with_disorder/' + prot.id + '.txt') as f:
+        with open('./result/YK17_nw_disorder_148/' + prot.id + '.txt') as f:
             lines = f.readlines()
             scores1 = []
             scores2 = []
             for i in range(len(prot.seq)):
-                scores1.append(float(lines[i].strip().split()[4]))
-                scores2.append(float(lines[i].strip().split()[6]))
+                scores1.append(float(lines[i].strip().split()[5]))
+                scores2.append(float(lines[i].strip().split()[7]))
             pred_scores21.append(scores1)
             pred_scores22.append(scores2)
-    return true_labels1, true_labels2, pred_scores11, pred_scores12, pred_scores21, pred_scores22
+
+        with open('result/YK7_nucbind/' + prot.id + '_DNA_svm.txt') as f:
+            labels31 = []
+            for line in f.readlines()[1:]:
+                labels31.append(float(line.strip().split()[2]))
+            pred_scores31.append(labels31)
+        with open('result/YK7_nucbind/' + prot.id + '_RNA_svm.txt') as f:
+            labels32 = []
+            for line in f.readlines()[1:]:
+                labels32.append(float(line.strip().split()[2]))
+            pred_scores32.append(labels32)
+
+    return true_labels1, true_labels2, pred_scores11, pred_scores12, pred_scores21, pred_scores22, pred_scores31, pred_scores32
 
 test_file_path = 'drnapred_data/TEST.fasta_seq.txt'
 # test_dir = './data/2017_'+tp+'_test_data_seq'
@@ -214,19 +228,23 @@ test_file_path = 'drnapred_data/TEST.fasta_seq.txt'
 # test_file_path = './data/YK16_test_seq3.txt'
 test_prots = list(SeqIO.parse(test_file_path, 'fasta'))
 
-true_labels1, true_labels2, pred_scores11, pred_scores12, pred_scores21, pred_scores22 = get_labels_scores(test_prots)
+true_labels1, true_labels2, pred_scores11, pred_scores12, pred_scores21, pred_scores22, pred_scores31, pred_scores32 = get_labels_scores(test_prots)
 
 # Threshold: 0.5000, 0.1500
 # Threshold: 0.4950, 0.1100
 print 'DNA'
-SN, SP, MCC, ACC = get_perfomance(true_labels1, pred_scores11, 4, 0.50)
+SN, SP, MCC, ACC = get_perfomance(true_labels1, pred_scores11, 3)
 print 'SN, MCC:', SN, MCC
-SN, SP, MCC, ACC = get_perfomance(true_labels1, pred_scores21, 4, 0.495)
+SN, SP, MCC, ACC = get_perfomance(true_labels1, pred_scores21, 3)
+print 'SN, MCC:', SN, MCC
+SN, SP, MCC, ACC = get_perfomance(true_labels1, pred_scores31, 3)
 print 'SN, MCC:', SN, MCC
 print 'RNA'
-SN, SP, MCC, ACC = get_perfomance(true_labels2, pred_scores12, 4, 0.15)
+SN, SP, MCC, ACC = get_perfomance(true_labels2, pred_scores12, 3)
 print 'SN, MCC:', SN, MCC
-SN, SP, MCC, ACC = get_perfomance(true_labels2, pred_scores22, 4, 0.11)
+SN, SP, MCC, ACC = get_perfomance(true_labels2, pred_scores22, 3)
+print 'SN, MCC:', SN, MCC
+SN, SP, MCC, ACC = get_perfomance(true_labels2, pred_scores32, 3)
 print 'SN, MCC:', SN, MCC
 
 # true_labels = np.asarray(true_labels)
